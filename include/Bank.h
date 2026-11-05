@@ -7,6 +7,9 @@
 #include "Account.h"
 #include "SavingsAccount.h"
 #include "CurrentAccount.h"
+#include "User.h"
+#include "Admin.h"
+#include "Customer.h"
 
 using namespace std;
 
@@ -15,13 +18,30 @@ class Bank {
 private:
 
     vector<unique_ptr<Account>> accounts;
+    vector<unique_ptr<User>> users;
 
     int nextAccountNumber = 100001;
 
-    // Private helper function
     Account* findAccount(int accNo);
 
+    bool usernameExists(string username);
+
 public:
+    Bank();
+
+    // Authentication
+    User* authenticateUser(string username, string password);
+
+    // Customer registration
+    int createSavingsAccount(
+        string name, long long amount,
+        string username, string password
+    );
+
+    int createCurrentAccount(
+        string name, long long amount,
+        string username, string password
+    );
 
     // Account creation
     void createSavingsAccount(string name, long long amount);
@@ -45,4 +65,6 @@ public:
     void checkBalance(int accNo);
 
     void showTransactionHistory(int accNo);
+
+    void transferMoney(int fromAccNo, int toAccNo, long long amount);
 };
