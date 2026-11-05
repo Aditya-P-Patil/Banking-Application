@@ -120,6 +120,7 @@ class SavingsAccount : public Account {
 
 private:
     double interestRate;
+    long long minimumBalance = 1000;
 
 public:
 
@@ -141,6 +142,24 @@ public:
         cout << "Account Type   : Savings Account\n";
         cout << "Interest Rate  : " << interestRate << "%\n";
         cout << "Interest       : Rs. " << calculateInterest() << "\n";
+    }
+
+    void withdraw(long long amount) override {
+
+        if (amount <= 0) {
+            cout << "Invalid withdrawal amount!\n";
+            return;
+        }
+
+        if (balance - amount < minimumBalance) {
+            cout << "Minimum balance of Rs. "
+                << minimumBalance << " must be maintained!\n";
+            return;
+        }
+
+        balance -= amount;
+
+        cout << "Amount withdrawn successfully!\n";
     }
 };
 
@@ -165,13 +184,30 @@ public:
         cout << "Account Type   : Current Account\n";
         cout << "Interest       : Not Applicable\n";
     }
+
+    void withdraw(long long amount) override {
+
+        if (amount <= 0) {
+            cout << "Invalid withdrawal amount!\n";
+            return;
+        }
+
+        if (amount > balance) {
+            cout << "Insufficient balance!\n";
+            return;
+        }
+
+        balance -= amount;
+
+        cout << "Amount withdrawn successfully!\n";
+    }
 };
 
-int findAccount(vector<Account>& accounts, int accNo) {
+int findAccount(vector<unique_ptr<Account>>& accounts, int accNo) {
 
     for (int i = 0; i < accounts.size(); i++) {
 
-        if (accounts[i].getAccountNumber() == accNo) {
+        if (accounts[i]->getAccountNumber() == accNo) {
             return i;
         }
     }
@@ -179,7 +215,7 @@ int findAccount(vector<Account>& accounts, int accNo) {
     return -1;
 }
 
-void closeAccount(vector<Account>& accounts, int accNo) {
+void closeAccount(vector<unique_ptr<Account>>& accounts, int accNo) {
 
     int index = findAccount(accounts, accNo);
 
@@ -188,7 +224,7 @@ void closeAccount(vector<Account>& accounts, int accNo) {
         return;
     }
 
-    if (accounts[index].getBalance() != 0) {
+    if (accounts[index]->getBalance() != 0) {
         cout << "Account must have zero balance before closing!\n";
         return;
     }
@@ -199,12 +235,13 @@ void closeAccount(vector<Account>& accounts, int accNo) {
 }
 
 
+
 int main() {
 
     vector<unique_ptr<Account>> accounts;
 
     int nextAccountNumber = 100001;
-    int choice, accNo;
+    int choice, accNo, accountType;
     long long amount;
     string name;
 
@@ -229,6 +266,17 @@ int main() {
 
             case 1: {
 
+                cout << "\nSelect Account Type:\n";
+                cout << "1. Savings Account\n";
+                cout << "2. Current Account\n";
+                cout << "Enter choice: ";
+                cin >> accountType;
+
+                if (accountType != 1 && accountType != 2) {
+                    cout << "Invalid account type!\n";
+                    break;
+                }
+
                 cout << "Enter account holder name: ";
                 getline(cin >> ws, name);
 
@@ -240,12 +288,28 @@ int main() {
                     break;
                 }
 
-                Account newAccount(nextAccountNumber, name, amount);
+                if (accountType == 1) {
 
-                accounts.push_back(newAccount);
+                    accounts.push_back(
+                        make_unique<SavingsAccount>(
+                            nextAccountNumber, name, amount
+                        )
+                    );
 
-                cout << "\nAccount created successfully!\n";
-                cout << "Your Account Number: " << nextAccountNumber << "\n";
+                    cout << "Savings Account created successfully!\n";
+                }
+                else {
+
+                    accounts.push_back(
+                        make_unique<CurrentAccount>(
+                            nextAccountNumber, name, amount
+                        )
+                    );
+
+                    cout << "Current Account created successfully!\n";
+                }
+
+                cout << "Account Number: " << nextAccountNumber << "\n";
 
                 nextAccountNumber++;
 
@@ -259,10 +323,8 @@ int main() {
                     break;
                 }
 
-                cout << "\n----- ALL BANK ACCOUNTS -----\n";
-
-                for (int i = 0; i < accounts.size(); i++) {
-                    accounts[i].displayDetails();
+                for (auto& acc : accounts) {
+                    acc->displayDetails();
                 }
 
                 break;
@@ -279,7 +341,7 @@ int main() {
                     cout << "Account not found!\n";
                 }
                 else {
-                    accounts[index].displayDetails();
+                    accounts[index]->displayDetails();
                 }
 
                 break;
@@ -300,7 +362,7 @@ int main() {
                 cout << "Enter deposit amount: ";
                 cin >> amount;
 
-                accounts[index].deposit(amount);
+                accounts[index]->deposit(amount);
 
                 break;
             }
@@ -320,13 +382,13 @@ int main() {
                 cout << "Enter withdrawal amount: ";
                 cin >> amount;
 
-                accounts[index].withdraw(amount);
+                accounts[index]->withdraw(amount);
 
                 break;
             }
 
             case 6: {
-                
+
                 cout << "Enter account number: ";
                 cin >> accNo;
 
@@ -340,7 +402,7 @@ int main() {
                 cout << "Enter new account holder name: ";
                 getline(cin >> ws, name);
 
-                accounts[index].updateName(name);
+                accounts[index]->updateName(name);
 
                 break;
             }
@@ -367,16 +429,18 @@ int main() {
                     break;
                 }
 
-                accounts[index].displayTransactionHistory();
+                accounts[index]->displayTransactionHistory();
 
                 break;
             }
 
             case 9:
+
                 cout << "Thank you for using BankSphere!\n";
                 return 0;
 
             default:
+
                 cout << "Invalid choice! Please try again.\n";
         }
     }
