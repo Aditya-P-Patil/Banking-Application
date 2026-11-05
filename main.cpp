@@ -21,7 +21,8 @@ void adminMenu(Bank& bank) {
         cout << "4. Withdraw Money\n";
         cout << "5. Update Account Details\n";
         cout << "6. Close Account\n";
-        cout << "7. Logout\n";
+        cout << "7. Transfer Money\n";
+        cout << "8. Logout\n";
         cout << "=====================================\n";
 
         cout << "Enter choice: ";
@@ -76,7 +77,24 @@ void adminMenu(Bank& bank) {
                 bank.closeAccount(accNo);
                 break;
 
-            case 7:
+            case 7: {
+                int fromAccNo, toAccNo;
+                long long amount;
+
+                cout << "Enter Sender Account Number: ";
+                cin >> fromAccNo;
+
+                cout << "Enter Receiver Account Number: ";
+                cin >> toAccNo;
+
+                cout << "Enter Amount to Transfer: ";
+                cin >> amount;
+
+                bank.transferMoney(fromAccNo, toAccNo, amount);
+                break;
+            }
+
+            case 8:
                 cout << "Admin logged out successfully!\n";
                 return;
 
@@ -100,7 +118,8 @@ void customerMenu(Bank& bank, int accNo) {
         cout << "3. Deposit Money\n";
         cout << "4. Withdraw Money\n";
         cout << "5. Transaction History\n";
-        cout << "6. Logout\n";
+        cout << "6. Transfer Money\n";
+        cout << "7. Logout\n";
         cout << "========================================\n";
 
         cout << "Enter choice: ";
@@ -134,7 +153,21 @@ void customerMenu(Bank& bank, int accNo) {
                 bank.showTransactionHistory(accNo);
                 break;
 
-            case 6:
+            case 6: {
+                int toAccNo;
+                long long amount;
+
+                cout << "Enter Receiver Account Number: ";
+                cin >> toAccNo;
+
+                cout << "Enter Amount to Transfer: ";
+                cin >> amount;
+
+                bank.transferMoney(accountNumber, toAccNo, amount);
+                break;
+            }
+
+            case 7:
                 cout << "Customer logged out successfully!\n";
                 return;
 
