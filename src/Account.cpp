@@ -88,12 +88,54 @@ void Account::displayTransactionHistory() {
 
     for (int i = 0; i < transactions.size(); i++) {
 
-        cout << "\nTransaction " << i + 1 << "\n";
+        cout << "\nTransaction ID : "
+             << transactions[i].transactionId << "\n";
 
-        cout << "Type   : " << transactions[i].type << "\n";
-        cout << "Amount : Rs. " << transactions[i].amount << "\n";
-        cout << "Status : " << transactions[i].status << "\n";
+        cout << "Type            : "
+             << transactions[i].type << "\n";
+
+        cout << "Amount          : Rs. "
+             << transactions[i].amount << "\n";
+
+        cout << "Status          : "
+             << transactions[i].status << "\n";
+
+        if (transactions[i].relatedAccount != -1) {
+            cout << "Related Account : "
+                 << transactions[i].relatedAccount << "\n";
+        }
+
+        cout << "-----------------------------------------\n";
     }
 
-    cout << "\n=========================================\n";
+    cout << "=========================================\n";
+}
+
+int Account::getLastTransactionId() {
+
+    if (transactions.empty()) {
+        return -1;
+    }
+
+    return transactions.back().transactionId;
+}
+
+
+void Account::updateLastTransaction(
+    string type,
+    string status,
+    int relatedAccount,
+    int transactionId
+) {
+
+    if (transactions.empty()) {
+        return;
+    }
+
+    Transaction& txn = transactions.back();
+
+    txn.type = type;
+    txn.status = status;
+    txn.relatedAccount = relatedAccount;
+    txn.transactionId = transactionId;
 }

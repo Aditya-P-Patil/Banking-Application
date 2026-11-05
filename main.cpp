@@ -163,7 +163,7 @@ void customerMenu(Bank& bank, int accNo) {
                 cout << "Enter Amount to Transfer: ";
                 cin >> amount;
 
-                bank.transferMoney(accountNumber, toAccNo, amount);
+                bank.transferMoney(accNo, toAccNo, amount);
                 break;
             }
 

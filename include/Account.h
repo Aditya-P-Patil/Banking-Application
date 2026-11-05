@@ -38,5 +38,14 @@ public:
 
     void displayTransactionHistory();
 
+    int getLastTransactionId();
+
+    void updateLastTransaction(
+        string type,
+        string status,
+        int relatedAccount,
+        int transactionId
+    );
+
     virtual double calculateInterest() = 0;
 };
