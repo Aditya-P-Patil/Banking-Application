@@ -1,49 +1,13 @@
 #include <iostream>
 #include <string>
-#include <vector>
-#include <memory>
-
-#include "SavingsAccount.h"
-#include "CurrentAccount.h"
+#include "Bank.h"
 
 using namespace std;
 
-int findAccount(vector<unique_ptr<Account>>& accounts, int accNo) {
-
-    for (int i = 0; i < accounts.size(); i++) {
-
-        if (accounts[i]->getAccountNumber() == accNo) {
-            return i;
-        }
-    }
-
-    return -1;
-}
-
-void closeAccount(vector<unique_ptr<Account>>& accounts, int accNo) {
-
-    int index = findAccount(accounts, accNo);
-
-    if (index == -1) {
-        cout << "Account not found!\n";
-        return;
-    }
-
-    if (accounts[index]->getBalance() != 0) {
-        cout << "Account must have zero balance before closing!\n";
-        return;
-    }
-
-    accounts.erase(accounts.begin() + index);
-
-    cout << "Account closed successfully!\n";
-}
-
 int main() {
 
-    vector<unique_ptr<Account>> accounts;
+    Bank bank;
 
-    int nextAccountNumber = 100001;
     int choice, accNo, accountType;
     long long amount;
     string name;
@@ -58,8 +22,9 @@ int main() {
         cout << "5. Withdraw Money\n";
         cout << "6. Update Account Details\n";
         cout << "7. Close Account\n";
-        cout << "8. Transaction History\n";
-        cout << "9. Exit\n";
+        cout << "8. Check Balance\n";
+        cout << "9. Transaction History\n";
+        cout << "10. Exit\n";
         cout << "================================\n";
 
         cout << "Enter your choice: ";
@@ -69,10 +34,9 @@ int main() {
 
             case 1: {
 
-                cout << "\nSelect Account Type:\n";
-                cout << "1. Savings Account\n";
+                cout << "\n1. Savings Account\n";
                 cout << "2. Current Account\n";
-                cout << "Enter choice: ";
+                cout << "Select account type: ";
                 cin >> accountType;
 
                 if (accountType != 1 && accountType != 2) {
@@ -86,158 +50,87 @@ int main() {
                 cout << "Enter initial balance: ";
                 cin >> amount;
 
-                if (amount < 0) {
-                    cout << "Invalid initial balance!\n";
-                    break;
-                }
-
                 if (accountType == 1) {
-
-                    accounts.push_back(
-                        make_unique<SavingsAccount>(
-                            nextAccountNumber, name, amount
-                        )
-                    );
-
-                    cout << "Savings Account created successfully!\n";
+                    bank.createSavingsAccount(name, amount);
                 }
                 else {
-
-                    accounts.push_back(
-                        make_unique<CurrentAccount>(
-                            nextAccountNumber, name, amount
-                        )
-                    );
-
-                    cout << "Current Account created successfully!\n";
-                }
-
-                cout << "Account Number: " << nextAccountNumber << "\n";
-
-                nextAccountNumber++;
-
-                break;
-            }
-
-            case 2: {
-
-                if (accounts.empty()) {
-                    cout << "No accounts registered yet!\n";
-                    break;
-                }
-
-                for (auto& acc : accounts) {
-                    acc->displayDetails();
+                    bank.createCurrentAccount(name, amount);
                 }
 
                 break;
             }
 
-            case 3: {
+            case 2:
+
+                bank.displayAllAccounts();
+                break;
+
+            case 3:
 
                 cout << "Enter account number: ";
                 cin >> accNo;
 
-                int index = findAccount(accounts, accNo);
-
-                if (index == -1) {
-                    cout << "Account not found!\n";
-                }
-                else {
-                    accounts[index]->displayDetails();
-                }
-
+                bank.searchAccount(accNo);
                 break;
-            }
 
-            case 4: {
+            case 4:
 
                 cout << "Enter account number: ";
                 cin >> accNo;
-
-                int index = findAccount(accounts, accNo);
-
-                if (index == -1) {
-                    cout << "Account not found!\n";
-                    break;
-                }
 
                 cout << "Enter deposit amount: ";
                 cin >> amount;
 
-                accounts[index]->deposit(amount);
-
+                bank.depositMoney(accNo, amount);
                 break;
-            }
 
-            case 5: {
+            case 5:
 
                 cout << "Enter account number: ";
                 cin >> accNo;
-
-                int index = findAccount(accounts, accNo);
-
-                if (index == -1) {
-                    cout << "Account not found!\n";
-                    break;
-                }
 
                 cout << "Enter withdrawal amount: ";
                 cin >> amount;
 
-                accounts[index]->withdraw(amount);
-
+                bank.withdrawMoney(accNo, amount);
                 break;
-            }
 
-            case 6: {
+            case 6:
 
                 cout << "Enter account number: ";
                 cin >> accNo;
-
-                int index = findAccount(accounts, accNo);
-
-                if (index == -1) {
-                    cout << "Account not found!\n";
-                    break;
-                }
 
                 cout << "Enter new account holder name: ";
                 getline(cin >> ws, name);
 
-                accounts[index]->updateName(name);
-
+                bank.updateAccount(accNo, name);
                 break;
-            }
 
-            case 7: {
+            case 7:
 
                 cout << "Enter account number to close: ";
                 cin >> accNo;
 
-                closeAccount(accounts, accNo);
-
+                bank.closeAccount(accNo);
                 break;
-            }
 
-            case 8: {
+            case 8:
 
                 cout << "Enter account number: ";
                 cin >> accNo;
 
-                int index = findAccount(accounts, accNo);
-
-                if (index == -1) {
-                    cout << "Account not found!\n";
-                    break;
-                }
-
-                accounts[index]->displayTransactionHistory();
-
+                bank.checkBalance(accNo);
                 break;
-            }
 
             case 9:
+
+                cout << "Enter account number: ";
+                cin >> accNo;
+
+                bank.showTransactionHistory(accNo);
+                break;
+
+            case 10:
 
                 cout << "Thank you for using BankSphere!\n";
                 return 0;
