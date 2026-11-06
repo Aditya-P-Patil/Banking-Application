@@ -7,13 +7,13 @@ using namespace std;
 
 Bank::Bank() {
 
-    // Default admin account
     users.push_back(
         make_unique<Admin>("admin", "admin123")
     );
 
-    // Load previously saved accounts
     loadAccounts();
+    loadUsers();
+    loadTransactions();
 }
 
 // Private helper function
@@ -212,6 +212,9 @@ void Bank::depositMoney(int accNo, long long amount) {
     if (acc->getBalance() != previousBalance) {
         saveAccounts();
     }
+
+    // Save successful or failed transaction
+    saveTransactions();
 }
 
 // Withdraw money
@@ -231,6 +234,9 @@ void Bank::withdrawMoney(int accNo, long long amount) {
     if (acc->getBalance() != previousBalance) {
         saveAccounts();
     }
+
+    // Save successful or failed transaction
+    saveTransactions();
 }
 
 // Check balance
@@ -325,6 +331,8 @@ void Bank::transferMoney(int fromAccNo, int toAccNo, long long amount) {
             transactionId
         );
 
+        saveTransactions();
+
         cout << "Transfer failed!\n";
         return;
     }
@@ -349,6 +357,7 @@ void Bank::transferMoney(int fromAccNo, int toAccNo, long long amount) {
     );
 
     saveAccounts();
+    saveTransactions();
 
     cout << "\nTransfer successful!\n";
     cout << "Transaction ID: " << transactionId << "\n";
@@ -463,4 +472,125 @@ void Bank::saveUsers() {
     file.close();
 
     cout << "User data saved successfully!\n";
+}
+
+void Bank::loadUsers() {
+
+    ifstream file("data/users.txt");
+
+    if (!file.is_open()) {
+        cout << "No previous user data found!\n";
+        return;
+    }
+
+    string role, username, password;
+    int accNo;
+
+    while (file >> role
+                >> quoted(username)
+                >> quoted(password)
+                >> accNo) {
+
+        if (role == "Customer") {
+
+            // Check whether associated account exists
+            if (findAccount(accNo) == nullptr) {
+                cout << "Account not found for user: "
+                     << username << "\n";
+                continue;
+            }
+
+            // Prevent duplicate usernames
+            if (usernameExists(username)) {
+                cout << "Duplicate username skipped: "
+                     << username << "\n";
+                continue;
+            }
+
+            users.push_back(
+                make_unique<Customer>(
+                    username, password, accNo
+                )
+            );
+        }
+    }
+
+    file.close();
+
+    cout << "User data loaded successfully!\n";
+}
+
+void Bank::saveTransactions() {
+
+    ofstream file("data/transactions.txt");
+
+    if (!file.is_open()) {
+        cout << "Error opening transactions file!\n";
+        return;
+    }
+
+    for (auto& acc : accounts) {
+
+        for (const auto& txn : acc->getTransactions()) {
+
+            file << acc->getAccountNumber() << " "
+                 << txn.transactionId << " "
+                 << quoted(txn.type) << " "
+                 << txn.amount << " "
+                 << quoted(txn.status) << " "
+                 << txn.relatedAccount << " "
+                 << static_cast<long long>(txn.timestamp)
+                 << "\n";
+        }
+    }
+
+    file.close();
+
+    cout << "Transactions saved successfully!\n";
+}
+
+void Bank::loadTransactions() {
+
+    ifstream file("data/transactions.txt");
+
+    if (!file.is_open()) {
+        cout << "No previous transaction data found!\n";
+        return;
+    }
+
+    int accNo, id, relatedAccount;
+    string type, status;
+    long long amount, timestamp;
+
+    while (file >> accNo
+                >> id
+                >> quoted(type)
+                >> amount
+                >> quoted(status)
+                >> relatedAccount
+                >> timestamp) {
+
+        Account* acc = findAccount(accNo);
+
+        if (acc == nullptr) {
+            cout << "Transaction account not found: "
+                 << accNo << "\n";
+            continue;
+        }
+
+        Transaction txn(
+            id,
+            type,
+            amount,
+            status,
+            relatedAccount,
+            static_cast<time_t>(timestamp)
+        );
+
+        acc->addTransaction(txn);
+    }
+
+    file.close();
+
+    cout << "Transaction data loaded successfully!\n";
 }

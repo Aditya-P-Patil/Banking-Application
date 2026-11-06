@@ -28,6 +28,8 @@ private:
 
     void saveUsers();
 
+    void saveTransactions();
+
 public:
     Bank();
 
@@ -77,4 +79,6 @@ public:
     void loadAccounts();
 
     void loadUsers();
+
+    void loadTransactions();
 };

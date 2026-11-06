@@ -54,4 +54,7 @@ public:
     virtual double calculateInterest() = 0;
     
     virtual string getAccountType() = 0;
+
+    const vector<Transaction>& getTransactions() const;
+    void addTransaction(const Transaction& txn);
 };

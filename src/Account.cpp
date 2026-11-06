@@ -191,3 +191,11 @@ void Account::displayTransactionSummary() {
 string Account::getAccountHolder() {
     return accountHolder;
 }
+
+const vector<Transaction>& Account::getTransactions() const {
+    return transactions;
+}
+
+void Account::addTransaction(const Transaction& txn) {
+    transactions.push_back(txn);
+}
