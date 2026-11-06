@@ -1,4 +1,5 @@
 #include "Account.h"
+#include <iomanip>
 
 Account::Account(int accNo, string name, long long initialBalance) {
 
@@ -90,6 +91,9 @@ void Account::displayTransactionHistory() {
 
         cout << "\nTransaction ID : "
              << transactions[i].transactionId << "\n";
+
+        cout << "Date & Time     : "
+             << put_time(localtime(&transactions[i].timestamp),"%d-%m-%Y %I:%M:%S %p") << "\n";
 
         cout << "Type            : "
              << transactions[i].type << "\n";

@@ -266,7 +266,7 @@ void Bank::transferMoney(int fromAccNo, int toAccNo, long long amount) {
         return;
     }
 
-    // 2. Prevent transferring to the same account
+    // 2. Prevent self-transfer
     if (fromAccNo == toAccNo) {
         cout << "Cannot transfer to the same account!\n";
         return;
@@ -281,22 +281,50 @@ void Bank::transferMoney(int fromAccNo, int toAccNo, long long amount) {
         return;
     }
 
-    // 4. Store sender's balance before withdrawal
+    // 4. Store sender's balance
     long long previousBalance = sender->getBalance();
 
-    // 5. Withdraw from sender
+    // 5. Withdraw money
     sender->withdraw(amount);
 
-    // 6. Check whether withdrawal was successful
+    // 6. Get the generated transaction ID
+    int transactionId = sender->getLastTransactionId();
+
+    // 7. Check whether withdrawal succeeded
     if (sender->getBalance() != previousBalance - amount) {
+
+        sender->updateLastTransaction(
+            "Transfer Sent",
+            "FAILED",
+            toAccNo,
+            transactionId
+        );
+
         cout << "Transfer failed!\n";
         return;
     }
 
-    // 7. Deposit into receiver
+    // 8. Update sender's transaction record
+    sender->updateLastTransaction(
+        "Transfer Sent",
+        "SUCCESS",
+        toAccNo,
+        transactionId
+    );
+
+    // 9. Deposit money into receiver's account
     receiver->deposit(amount);
 
+    // 10. Update receiver's transaction record
+    receiver->updateLastTransaction(
+        "Transfer Received",
+        "SUCCESS",
+        fromAccNo,
+        transactionId
+    );
+
     cout << "\nTransfer successful!\n";
+    cout << "Transaction ID: " << transactionId << "\n";
     cout << "Transferred Amount: Rs. " << amount << "\n";
     cout << "From Account: " << fromAccNo << "\n";
     cout << "To Account: " << toAccNo << "\n";

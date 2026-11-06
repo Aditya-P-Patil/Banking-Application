@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <ctime>
 using namespace std;
 
 struct Transaction {
@@ -12,6 +13,7 @@ struct Transaction {
     long long amount;
     string status;
     int relatedAccount;
+    time_t timestamp;
 
     Transaction(
         string type,
@@ -24,5 +26,7 @@ struct Transaction {
         this->amount = amount;
         this->status = status;
         this->relatedAccount = relatedAccount;
+
+        timestamp = time(nullptr);
     }
 };
