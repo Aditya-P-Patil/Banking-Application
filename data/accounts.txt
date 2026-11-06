@@ -1,3 +1,0 @@
-Savings 100001 "aditya" 10000
-Current 100002 "rahul" 20000
-Current 100003 "rohit" 30000
