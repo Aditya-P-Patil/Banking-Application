@@ -13,6 +13,5 @@ string Customer::getRole() const {
 }
 
 int Customer::getAccountNumber() const {
-
     return accountNumber;
 }

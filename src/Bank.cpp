@@ -1,4 +1,5 @@
-
+#include <fstream>
+#include <iomanip>
 #include "Bank.h"
 #include <iostream>
 
@@ -10,6 +11,9 @@ Bank::Bank() {
     users.push_back(
         make_unique<Admin>("admin", "admin123")
     );
+
+    // Load previously saved accounts
+    loadAccounts();
 }
 
 // Private helper function
@@ -56,6 +60,8 @@ int Bank::createSavingsAccount(
     );
 
     nextAccountNumber++;
+    saveUsers();
+    saveAccounts();
 
     cout << "\nSavings Account created successfully!\n";
     cout << "Account Number: " << accNo << "\n";
@@ -95,6 +101,8 @@ int Bank::createCurrentAccount(
     );
 
     nextAccountNumber++;
+    saveUsers();
+    saveAccounts();
 
     cout << "\nCurrent Account created successfully!\n";
     cout << "Account Number: " << accNo << "\n";
@@ -139,6 +147,8 @@ void Bank::updateAccount(int accNo, string newName) {
         return;
     }
 
+    saveAccounts();
+
     acc->updateName(newName);
 }
 
@@ -180,6 +190,9 @@ void Bank::closeAccount(int accNo) {
     }
 
     cout << "Account closed successfully!\n";
+
+    saveUsers();
+    saveAccounts();
 }
 
 // Deposit money
@@ -192,7 +205,13 @@ void Bank::depositMoney(int accNo, long long amount) {
         return;
     }
 
+    long long previousBalance = acc->getBalance();
+
     acc->deposit(amount);
+
+    if (acc->getBalance() != previousBalance) {
+        saveAccounts();
+    }
 }
 
 // Withdraw money
@@ -205,7 +224,13 @@ void Bank::withdrawMoney(int accNo, long long amount) {
         return;
     }
 
+    long long previousBalance = acc->getBalance();
+
     acc->withdraw(amount);
+
+    if (acc->getBalance() != previousBalance) {
+        saveAccounts();
+    }
 }
 
 // Check balance
@@ -323,6 +348,8 @@ void Bank::transferMoney(int fromAccNo, int toAccNo, long long amount) {
         transactionId
     );
 
+    saveAccounts();
+
     cout << "\nTransfer successful!\n";
     cout << "Transaction ID: " << transactionId << "\n";
     cout << "Transferred Amount: Rs. " << amount << "\n";
@@ -340,4 +367,100 @@ void Bank::showTransactionSummary(int accNo) {
     }
 
     acc->displayTransactionSummary();
+}
+
+void Bank::saveAccounts() {
+
+    ofstream file("data/accounts.txt");
+
+    if (!file.is_open()) {
+        cout << "Error opening accounts file!\n";
+        return;
+    }
+
+    for (auto& acc : accounts) {
+
+        file << acc->getAccountType() << " "
+             << acc->getAccountNumber() << " "
+             << quoted(acc->getAccountHolder()) << " "
+             << acc->getBalance() << "\n";
+    }
+
+    file.close();
+
+    cout << "Accounts saved successfully!\n";
+}
+
+void Bank::loadAccounts() {
+
+    ifstream file("data/accounts.txt");
+
+    if (!file.is_open()) {
+        cout << "No previous account data found!\n";
+        return;
+    }
+
+    string type, name;
+    int accNo;
+    long long balance;
+
+    while (file >> type >> accNo >> quoted(name) >> balance) {
+
+        if (type == "Savings") {
+
+            accounts.push_back(
+                make_unique<SavingsAccount>(
+                    accNo, name, balance
+                )
+            );
+        }
+        else if (type == "Current") {
+
+            accounts.push_back(
+                make_unique<CurrentAccount>(
+                    accNo, name, balance
+                )
+            );
+        }
+        else {
+            cout << "Unknown account type found!\n";
+            continue;
+        }
+
+        // Update next available account number
+        if (accNo >= nextAccountNumber) {
+            nextAccountNumber = accNo + 1;
+        }
+    }
+
+    file.close();
+
+    cout << "Account data loaded successfully!\n";
+}
+
+void Bank::saveUsers() {
+
+    ofstream file("data/users.txt");
+
+    if (!file.is_open()) {
+        cout << "Error opening users file!\n";
+        return;
+    }
+
+    for (auto& user : users) {
+
+        Customer* customer = dynamic_cast<Customer*>(user.get());
+
+        if (customer != nullptr) {
+
+            file << "Customer "
+                 << quoted(customer->getUsername()) << " "
+                 << quoted(customer->getPassword()) << " "
+                 << customer->getAccountNumber() << "\n";
+        }
+    }
+
+    file.close();
+
+    cout << "User data saved successfully!\n";
 }

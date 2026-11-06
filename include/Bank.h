@@ -26,6 +26,8 @@ private:
 
     bool usernameExists(string username);
 
+    void saveUsers();
+
 public:
     Bank();
 
@@ -69,4 +71,10 @@ public:
     void transferMoney(int fromAccNo, int toAccNo, long long amount);
 
     void showTransactionSummary(int accNo);
+
+    void saveAccounts();
+
+    void loadAccounts();
+
+    void loadUsers();
 };

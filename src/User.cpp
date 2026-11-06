@@ -17,3 +17,7 @@ string User::getUsername() const {
 
     return username;
 }
+
+string User::getPassword() const {
+    return password;
+}

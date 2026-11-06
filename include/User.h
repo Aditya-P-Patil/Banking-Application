@@ -22,5 +22,7 @@ public:
 
     string getUsername() const;
 
+    string getPassword() const;
+
     virtual string getRole() const = 0;
 };
