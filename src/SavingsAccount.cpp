@@ -46,3 +46,7 @@ void SavingsAccount::displayDetails() {
     cout << "Interest Rate  : " << interestRate << "%\n";
     cout << "Interest       : Rs. " << calculateInterest() << "\n";
 }
+
+string SavingsAccount::getAccountType() {
+    return "Savings";
+}

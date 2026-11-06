@@ -49,5 +49,9 @@ public:
 
     void displayTransactionSummary();
 
+    string getAccountHolder();
+
     virtual double calculateInterest() = 0;
+    
+    virtual string getAccountType() = 0;
 };

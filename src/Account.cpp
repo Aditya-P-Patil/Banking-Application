@@ -187,3 +187,7 @@ void Account::displayTransactionSummary() {
 
     cout << "=========================================\n";
 }
+
+string Account::getAccountHolder() {
+    return accountHolder;
+}

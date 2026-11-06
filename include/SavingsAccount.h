@@ -18,4 +18,6 @@ public:
     void withdraw(long long amount) override;
 
     void displayDetails() override;
+
+    string getAccountType() override;
 };

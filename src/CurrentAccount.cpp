@@ -41,3 +41,7 @@ void CurrentAccount::displayDetails() {
     cout << "Account Type   : Current Account\n";
     cout << "Interest       : Not Applicable\n";
 }
+
+string CurrentAccount::getAccountType() {
+    return "Current";
+}
