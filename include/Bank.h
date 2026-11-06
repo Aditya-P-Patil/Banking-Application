@@ -67,4 +67,6 @@ public:
     void showTransactionHistory(int accNo);
 
     void transferMoney(int fromAccNo, int toAccNo, long long amount);
+
+    void showTransactionSummary(int accNo);
 };

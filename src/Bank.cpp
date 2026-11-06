@@ -329,3 +329,15 @@ void Bank::transferMoney(int fromAccNo, int toAccNo, long long amount) {
     cout << "From Account: " << fromAccNo << "\n";
     cout << "To Account: " << toAccNo << "\n";
 }
+
+void Bank::showTransactionSummary(int accNo) {
+
+    Account* acc = findAccount(accNo);
+
+    if (acc == nullptr) {
+        cout << "Account not found!\n";
+        return;
+    }
+
+    acc->displayTransactionSummary();
+}

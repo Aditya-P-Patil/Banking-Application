@@ -47,5 +47,7 @@ public:
         int transactionId
     );
 
+    void displayTransactionSummary();
+
     virtual double calculateInterest() = 0;
 };

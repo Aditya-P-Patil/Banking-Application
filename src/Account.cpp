@@ -143,3 +143,47 @@ void Account::updateLastTransaction(
     txn.relatedAccount = relatedAccount;
     txn.transactionId = transactionId;
 }
+
+void Account::displayTransactionSummary() {
+
+    long long deposits = 0;
+    long long withdrawals = 0;
+    long long transfersSent = 0;
+    long long transfersReceived = 0;
+
+    int totalTransactions = transactions.size();
+    int failedTransactions = 0;
+
+    for (auto& txn : transactions) {
+
+        if (txn.status == "FAILED") {
+            failedTransactions++;
+            continue;
+        }
+
+        if (txn.type == "Deposit") {
+            deposits += txn.amount;
+        }
+        else if (txn.type == "Withdrawal") {
+            withdrawals += txn.amount;
+        }
+        else if (txn.type == "Transfer Sent") {
+            transfersSent += txn.amount;
+        }
+        else if (txn.type == "Transfer Received") {
+            transfersReceived += txn.amount;
+        }
+    }
+
+    cout << "\n========== TRANSACTION SUMMARY ==========\n";
+
+    cout << "Total Deposits       : Rs. " << deposits << "\n";
+    cout << "Total Withdrawals    : Rs. " << withdrawals << "\n";
+    cout << "Transfers Sent       : Rs. " << transfersSent << "\n";
+    cout << "Transfers Received   : Rs. " << transfersReceived << "\n";
+
+    cout << "Total Transactions   : " << totalTransactions << "\n";
+    cout << "Failed Transactions  : " << failedTransactions << "\n";
+
+    cout << "=========================================\n";
+}

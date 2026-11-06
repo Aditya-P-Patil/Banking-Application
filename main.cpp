@@ -22,7 +22,8 @@ void adminMenu(Bank& bank) {
         cout << "5. Update Account Details\n";
         cout << "6. Close Account\n";
         cout << "7. Transfer Money\n";
-        cout << "8. Logout\n";
+        cout << "8. View Transaction Summary\n";
+        cout << "9. Logout\n";
         cout << "=====================================\n";
 
         cout << "Enter choice: ";
@@ -94,7 +95,17 @@ void adminMenu(Bank& bank) {
                 break;
             }
 
-            case 8:
+            case 8: {
+                int accNo;
+
+                cout << "Enter Account Number: ";
+                cin >> accNo;
+
+                bank.showTransactionSummary(accNo);
+                break;
+            }
+
+            case 9:
                 cout << "Admin logged out successfully!\n";
                 return;
 
@@ -119,7 +130,8 @@ void customerMenu(Bank& bank, int accNo) {
         cout << "4. Withdraw Money\n";
         cout << "5. Transaction History\n";
         cout << "6. Transfer Money\n";
-        cout << "7. Logout\n";
+        cout << "7. View Transaction Summary\n";
+        cout << "8. Logout\n";
         cout << "========================================\n";
 
         cout << "Enter choice: ";
@@ -168,6 +180,10 @@ void customerMenu(Bank& bank, int accNo) {
             }
 
             case 7:
+                bank.showTransactionSummary(accNo);
+                break;
+
+            case 8:
                 cout << "Customer logged out successfully!\n";
                 return;
 
