@@ -87,7 +87,7 @@ void Account::displayTransactionHistory() {
 
     cout << "\n========== TRANSACTION HISTORY ==========\n";
 
-    for (int i = 0; i < transactions.size(); i++) {
+    for (size_t i = 0; i < transactions.size(); i++) {
 
         cout << "\nTransaction ID : "
              << transactions[i].transactionId << "\n";
@@ -151,7 +151,7 @@ void Account::displayTransactionSummary() {
     long long transfersSent = 0;
     long long transfersReceived = 0;
 
-    int totalTransactions = transactions.size();
+    size_t totalTransactions = transactions.size();
     int failedTransactions = 0;
 
     for (auto& txn : transactions) {

@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <fstream>
 #include <iomanip>
 #include "Bank.h"
@@ -7,10 +8,15 @@ using namespace std;
 
 Bank::Bank() {
 
+    // Automatically create data folder if missing
+    filesystem::create_directories("data");
+
+    // Create default admin
     users.push_back(
         make_unique<Admin>("admin", "admin123")
     );
 
+    // Load saved data
     loadAccounts();
     loadUsers();
     loadTransactions();
@@ -147,9 +153,9 @@ void Bank::updateAccount(int accNo, string newName) {
         return;
     }
 
-    saveAccounts();
-
     acc->updateName(newName);
+    
+    saveAccounts();
 }
 
 // Close account
@@ -193,6 +199,7 @@ void Bank::closeAccount(int accNo) {
 
     saveUsers();
     saveAccounts();
+    saveTransactions();
 }
 
 // Deposit money
@@ -415,6 +422,17 @@ void Bank::loadAccounts() {
 
     while (file >> type >> accNo >> quoted(name) >> balance) {
 
+        if (accNo <= 0 || balance < 0 || name.empty()) {
+            cout << "Invalid account record skipped!\n";
+            continue;
+        }
+
+        if (findAccount(accNo) != nullptr) {
+            cout << "Duplicate account number skipped: "
+                << accNo << "\n";
+            continue;
+        }
+
         if (type == "Savings") {
 
             accounts.push_back(
@@ -490,6 +508,11 @@ void Bank::loadUsers() {
                 >> quoted(username)
                 >> quoted(password)
                 >> accNo) {
+
+        if (username.empty() || password.empty() || accNo <= 0) {
+            cout << "Invalid user record skipped!\n";
+            continue;
+        }
 
         if (role == "Customer") {
 
@@ -570,6 +593,12 @@ void Bank::loadTransactions() {
                 >> relatedAccount
                 >> timestamp) {
 
+        if (id <= 0 || (status != "SUCCESS" && status != "FAILED") || timestamp < 0 || relatedAccount < -1) {
+
+            cout << "Invalid transaction record skipped!\n";
+            continue;
+        }
+        
         Account* acc = findAccount(accNo);
 
         if (acc == nullptr) {

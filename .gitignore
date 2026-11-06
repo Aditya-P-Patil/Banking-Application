@@ -4,3 +4,6 @@
 # Object files
 *.o
 *.out
+
+# User-generated banking data
+data/*.txt
